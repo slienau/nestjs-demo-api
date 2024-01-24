@@ -26,5 +26,25 @@ describe('App End-to-End', () => {
     await app.close(); // stop the app
   });
 
-  it.todo('should pass');
+  describe('Auth', () => {
+    describe('Signup', () => {
+      it.todo('should create a new user');
+    });
+    describe('Login', () => {
+      it.todo('should return a token');
+    });
+  });
+
+  describe('User', () => {
+    describe('Get me', () => {});
+    describe('Edit user', () => {});
+  });
+
+  describe('Bookmarks', () => {
+    describe('Create Bookmark', () => {});
+    describe('Get bookmarks', () => {});
+    describe('Get bookmark by id', () => {});
+    describe('Edit bookmark', () => {});
+    describe('Delete bookmark', () => {});
+  });
 });
