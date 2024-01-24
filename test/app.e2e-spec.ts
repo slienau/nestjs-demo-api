@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as pactum from 'pactum';
 import { AuthDto } from 'src/auth/dto';
@@ -191,10 +191,128 @@ describe('App End-to-End', () => {
   });
 
   describe('Bookmarks', () => {
-    describe('Create Bookmark', () => {});
-    describe('Get bookmarks', () => {});
-    describe('Get bookmark by id', () => {});
-    describe('Edit bookmark by id', () => {});
-    describe('Delete bookmark by id', () => {});
+    const dtos = [
+      {
+        title: 'Google',
+        link: 'https://www.google.com',
+      },
+      {
+        title: 'Facebook',
+        link: 'https://www.facebook.com',
+      },
+      {
+        title: 'Twitter',
+        link: 'https://www.twitter.com',
+      },
+    ];
+    const bookmarkIds = [];
+
+    it('should return an empty array', () => {
+      return pactum
+        .spec()
+        .get('/bookmarks')
+        .withHeaders({
+          Authorization: `Bearer $S{access_token}`,
+        })
+        .expectStatus(200)
+        .expectJsonLength(0)
+        .expectJsonLike([]);
+    });
+
+    describe('Create Bookmark', () => {
+      describe('should create new bookmarks', () => {
+        dtos.forEach((dto, index) => {
+          it(`should create bookmark "${dto.title}"`, async () => {
+            const res = await pactum
+              .spec()
+              .post('/bookmarks')
+              .withBody(dto)
+              .withHeaders({
+                Authorization: `Bearer $S{access_token}`,
+              })
+              .expectStatus(201)
+              .expectBodyContains(dto.title)
+              .expectBodyContains(dto.link);
+
+            bookmarkIds[index] = res.body.id;
+
+            return res;
+          });
+        });
+      });
+    });
+
+    describe('Get bookmarks', () => {
+      it('should get all bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .expectStatus(200)
+          .expectJsonLength(3)
+          .expectBodyContains(dtos[0].title)
+          .expectBodyContains(dtos[0].link)
+          .expectBodyContains(dtos[1].title)
+          .expectBodyContains(dtos[1].link)
+          .expectBodyContains(dtos[2].title)
+          .expectBodyContains(dtos[2].link);
+      });
+    });
+    describe('Get bookmark by id', () => {
+      it('should get bookmark by id', () => {
+        return pactum
+          .spec()
+          .get(`/bookmarks/${bookmarkIds[0]}`)
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .expectStatus(200)
+          .expectBodyContains(dtos[0].title)
+          .expectBodyContains(dtos[0].link);
+      });
+    });
+
+    describe('Edit bookmark by id', () => {
+      it('should edit bookmark by id', () => {
+        const dto = {
+          title: 'New Title',
+          link: 'https://www.newlink.com',
+        };
+
+        return pactum
+          .spec()
+          .patch(`/bookmarks/${bookmarkIds[0]}`)
+          .withBody(dto)
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .expectStatus(200)
+          .expectBodyContains(dto.title)
+          .expectBodyContains(dto.link);
+      });
+    });
+
+    describe('Delete bookmark by id', () => {
+      it('should delete bookmark by id', async () => {
+        await pactum
+          .spec()
+          .delete(`/bookmarks/${bookmarkIds[0]}`)
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .expectStatus(HttpStatus.NO_CONTENT);
+
+        return pactum
+          .spec()
+          .get(`/bookmarks/${bookmarkIds[0]}`)
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .inspect()
+          .expectStatus(HttpStatus.NOT_FOUND);
+      });
+    });
   });
 });
