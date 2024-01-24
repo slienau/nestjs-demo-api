@@ -37,50 +37,50 @@ describe('App End-to-End', () => {
       password: '12345678',
     };
 
-    it('should throw an error because password is empty', () => {
-      return pactum
-        .spec()
-        .post('/auth/signup')
-        .withBody({ ...dto, password: undefined })
-        .expectStatus(400)
-        .expectJsonLike('message', ['password should not be empty']);
-      // .inspect();
-    });
-
-    it('should throw an error because email is empty', () => {
-      return pactum
-        .spec()
-        .post('/auth/signup')
-        .withBody({ ...dto, email: undefined })
-        .expectStatus(400)
-        .expectJsonLike('message', ['email should not be empty']);
-    });
-
-    it('should throw an error because email is invalid', () => {
-      return pactum
-        .spec()
-        .post('/auth/signup')
-        .withBody({ ...dto, email: 'invalid@mail' })
-        .expectStatus(400)
-        .expectJsonLike('message', ['email must be an email']);
-    });
-
-    it('should throw an error because password has fewer than 8 characters', () => {
-      return pactum
-        .spec()
-        .post('/auth/signup')
-        .withBody({ ...dto, password: '1234567' })
-        .expectStatus(400)
-        .expectJsonLike('message', [
-          'password must be longer than or equal to 8 characters',
-        ]);
-    });
-
-    it('should throw an error because no body provided', () => {
-      return pactum.spec().post('/auth/signup').expectStatus(400);
-    });
-
     describe('Signup', () => {
+      it('should throw an error because password is empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({ ...dto, password: undefined })
+          .expectStatus(400)
+          .expectJsonLike('message', ['password should not be empty']);
+        // .inspect();
+      });
+
+      it('should throw an error because email is empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({ ...dto, email: undefined })
+          .expectStatus(400)
+          .expectJsonLike('message', ['email should not be empty']);
+      });
+
+      it('should throw an error because email is invalid', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({ ...dto, email: 'invalid@mail' })
+          .expectStatus(400)
+          .expectJsonLike('message', ['email must be an email']);
+      });
+
+      it('should throw an error because password has fewer than 8 characters', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({ ...dto, password: '1234567' })
+          .expectStatus(400)
+          .expectJsonLike('message', [
+            'password must be longer than or equal to 8 characters',
+          ]);
+      });
+
+      it('should throw an error because no body provided', () => {
+        return pactum.spec().post('/auth/signup').expectStatus(400);
+      });
+
       it('should create a new user', () => {
         return pactum
           .spec()
@@ -88,10 +88,14 @@ describe('App End-to-End', () => {
           .withBody(dto)
           .expectStatus(201);
       });
-    });
 
-    it('should throw an error because email already taken', () => {
-      return pactum.spec().post('/auth/signup').withBody(dto).expectStatus(403);
+      it('should throw an error because email already taken', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody(dto)
+          .expectStatus(403);
+      });
     });
 
     describe('Login', () => {
@@ -100,56 +104,68 @@ describe('App End-to-End', () => {
           .spec()
           .post('/auth/login')
           .withBody(dto)
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores('access_token', 'access_token');
       });
-    });
 
-    it('should throw an error because password is empty', () => {
-      return pactum
-        .spec()
-        .post('/auth/login')
-        .withBody({ ...dto, password: undefined })
-        .expectStatus(400)
-        .expectJsonLike('message', ['password should not be empty']);
-      // .inspect();
-    });
+      it('should throw an error because password is empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/login')
+          .withBody({ ...dto, password: undefined })
+          .expectStatus(400)
+          .expectJsonLike('message', ['password should not be empty']);
+        // .inspect();
+      });
 
-    it('should throw an error because email is empty', () => {
-      return pactum
-        .spec()
-        .post('/auth/login')
-        .withBody({ ...dto, email: undefined })
-        .expectStatus(400)
-        .expectJsonLike('message', ['email should not be empty']);
-    });
+      it('should throw an error because email is empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/login')
+          .withBody({ ...dto, email: undefined })
+          .expectStatus(400)
+          .expectJsonLike('message', ['email should not be empty']);
+      });
 
-    it('should throw an error because email is invalid', () => {
-      return pactum
-        .spec()
-        .post('/auth/login')
-        .withBody({ ...dto, email: 'invalid@mail' })
-        .expectStatus(400)
-        .expectJsonLike('message', ['email must be an email']);
-    });
+      it('should throw an error because email is invalid', () => {
+        return pactum
+          .spec()
+          .post('/auth/login')
+          .withBody({ ...dto, email: 'invalid@mail' })
+          .expectStatus(400)
+          .expectJsonLike('message', ['email must be an email']);
+      });
 
-    it('should throw an error because password has fewer than 8 characters', () => {
-      return pactum
-        .spec()
-        .post('/auth/login')
-        .withBody({ ...dto, password: '1234567' })
-        .expectStatus(400)
-        .expectJsonLike('message', [
-          'password must be longer than or equal to 8 characters',
-        ]);
-    });
+      it('should throw an error because password has fewer than 8 characters', () => {
+        return pactum
+          .spec()
+          .post('/auth/login')
+          .withBody({ ...dto, password: '1234567' })
+          .expectStatus(400)
+          .expectJsonLike('message', [
+            'password must be longer than or equal to 8 characters',
+          ]);
+      });
 
-    it('should throw an error because no body provided', () => {
-      return pactum.spec().post('/auth/login').expectStatus(400);
+      it('should throw an error because no body provided', () => {
+        return pactum.spec().post('/auth/login').expectStatus(400);
+      });
     });
   });
 
   describe('User', () => {
-    describe('Get me', () => {});
+    describe('Get me', () => {
+      it('should get current user', () => {
+        return pactum
+          .spec()
+          .get('/users/me')
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .expectStatus(200);
+      });
+    });
+
     describe('Edit user', () => {});
   });
 
@@ -157,7 +173,7 @@ describe('App End-to-End', () => {
     describe('Create Bookmark', () => {});
     describe('Get bookmarks', () => {});
     describe('Get bookmark by id', () => {});
-    describe('Edit bookmark', () => {});
-    describe('Delete bookmark', () => {});
+    describe('Edit bookmark by id', () => {});
+    describe('Delete bookmark by id', () => {});
   });
 });
