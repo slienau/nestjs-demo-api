@@ -4,6 +4,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as pactum from 'pactum';
 import { AuthDto } from 'src/auth/dto';
+import { EditUserDto } from 'src/user/dto';
 
 pactum.request.setBaseUrl('http://localhost:3001');
 
@@ -166,7 +167,27 @@ describe('App End-to-End', () => {
       });
     });
 
-    describe('Edit user', () => {});
+    describe('Edit user', () => {
+      it('should edit current user', () => {
+        const dto: EditUserDto = {
+          email: 'new-email@gmail.com',
+          firstName: 'New Name',
+          lastName: 'New Last Name',
+        };
+
+        return pactum
+          .spec()
+          .patch('/users')
+          .withBody(dto)
+          .withHeaders({
+            Authorization: `Bearer $S{access_token}`,
+          })
+          .expectStatus(200)
+          .expectBodyContains(dto.email)
+          .expectBodyContains(dto.firstName)
+          .expectBodyContains(dto.lastName);
+      });
+    });
   });
 
   describe('Bookmarks', () => {
